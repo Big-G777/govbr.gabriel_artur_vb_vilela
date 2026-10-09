@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documento de Identificação Digital</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #0f172a;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      display: none;
+    }
+    /* Evita arrasto padrão de elementos img durante o swipe */
+    img {
+      -webkit-user-drag: none;
+      user-select: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-2 sm:p-6 text-slate-800 select-none">
+
+  <!-- Container Principal / Frame de Celular Limpo (Sem barra preta superior) -->
+  <div class="relative w-full max-w-[412px] h-[860px] max-h-[95vh] bg-white rounded-[38px] shadow-2xl flex flex-col overflow-hidden border border-slate-200">
+    
+    <!-- Top Header Bar com Badge Amarela e Botão Fechar -->
+    <div class="relative flex items-center justify-center px-4 pt-4 pb-3 border-b border-slate-100 bg-white z-10">
+      <!-- Badge Amarela Central -->
+      <div class="bg-[#eab308] text-slate-900 text-[11px] font-bold tracking-wider px-3.5 py-1.2 rounded-sm shadow-sm uppercase">
+        DOCUMENTO DE IDENTIFICAÇÃO
+      </div>
+      <!-- Botão Fechar (X) -->
+      <a href="index.html">
+        <button onclick="resetApp()" class="absolute right-4 text-slate-600 hover:text-slate-900 transition-colors p-1" title="Fechar">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </a>
+    </div>
+
+    <!-- Conteúdo Principal / Visualizador de Fotos da Carteira (Deslizável) -->
+    <div class="flex-1 relative overflow-hidden bg-slate-100 flex flex-col justify-between">
+      
+      <!-- Input de Upload Oculto -->
+      <input type="file" id="file-input" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+
+      <!-- Container do Carrossel de 4 Fotos -->
+      <div id="touch-container" class="relative w-full flex-1 flex items-center justify-center cursor-grab active:cursor-grabbing overflow-hidden">
+        <div id="document-slides" class="flex w-full h-full transition-transform duration-300 ease-out">
+          
+          <!-- Foto 1 da Carteira -->
+          <div class="w-full h-full flex-shrink-0 p-4 flex flex-col items-center justify-center">
+            <div class="relative w-full h-full max-h-[580px] bg-white rounded-2xl shadow-md border border-slate-200/80 overflow-hidden flex flex-col items-center justify-center group">
+              <img id="img-0" src="WhatsApp Image 2026-10-08 at 19.07.12.jpeg" class="w-full h-full object-contain transition-transform duration-200" alt="Foto 1 da Carteira">
+              
+              <!-- Botão de Trocar Imagem -->
+              
+            </div>
+          </div>
+
+          <!-- Foto 2 da Carteira -->
+          <div class="w-full h-full flex-shrink-0 p-4 flex flex-col items-center justify-center">
+            <div class="relative w-full h-full max-h-[580px] bg-white rounded-2xl shadow-md border border-slate-200/80 overflow-hidden flex flex-col items-center justify-center group">
+              <img id="img-1" src="WhatsApp Image 2026-10-08 at 19.24.58.jpeg" class="w-full h-full object-contain transition-transform duration-200" alt="Foto 2 da Carteira">
+              
+            </div>
+          </div>
+
+          <!-- Foto 3 da Carteira -->
+          <div class="w-full h-full flex-shrink-0 p-4 flex flex-col items-center justify-center">
+            <div class="relative w-full h-full max-h-[580px] bg-white rounded-2xl shadow-md border border-slate-200/80 overflow-hidden flex flex-col items-center justify-center group">
+              <img id="img-2" src="WhatsApp Image 2026-10-08 at 19.24.58 (1).jpeg" class="w-full h-full object-contain transition-transform duration-200" alt="Foto 3 da Carteira">
+              
+             
+            </div>
+          </div>
+
+          <!-- Foto 4 da Carteira -->
+          <div class="w-full h-full flex-shrink-0 p-4 flex flex-col items-center justify-center">
+            <div class="relative w-full h-full max-h-[580px] bg-white rounded-2xl shadow-md border border-slate-200/80 overflow-hidden flex flex-col items-center justify-center group">
+              <img id="img-3" src="WhatsApp Image 2026-10-08 at 19.24.58 (2).jpeg" class="w-full h-full object-contain transition-transform duration-200" alt="Foto 4 da Carteira">
+              
+              
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Barra Intermediária de Ações e Paginação -->
+      <div class="px-5 py-3 flex items-center justify-between select-none relative z-10 bg-slate-100 border-t border-slate-200/60">
+        
+        <!-- Botão Lupa com '+' -->
+        <button onclick="toggleZoom()" class="w-11 h-11 bg-slate-200 hover:bg-slate-300 active:scale-95 rounded-2xl flex items-center justify-center text-slate-700 shadow-sm transition-all" title="Ampliar">
+          <i data-lucide="zoom-in" class="w-5 h-5"></i>
+        </button>
+
+        <!-- Indicador de Páginas / 4 Dots e Seta -->
+        <div class="flex items-center gap-2">
+          <div id="dots-container" class="flex items-center gap-2">
+            <button onclick="goToSlide(0)" class="dot w-2.5 h-2.5 rounded-full bg-[#1e3a8a] transition-all"></button>
+            <button onclick="goToSlide(1)" class="dot w-2 h-2 rounded-full bg-slate-300 transition-all"></button>
+            <button onclick="goToSlide(2)" class="dot w-2 h-2 rounded-full bg-slate-300 transition-all"></button>
+            <button onclick="goToSlide(3)" class="dot w-2 h-2 rounded-full bg-slate-300 transition-all"></button>
+          </div>
+          <!-- Seta Direita -->
+          <button onclick="nextSlide()" class="text-slate-600 hover:text-slate-900 ml-1 p-1">
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- Botão Verde Flutuante (FAB 3 Pontos Verdes) -->
+        <div class="relative">
+          <button onclick="toggleFabMenu()" class="w-11 h-11 bg-[#00a859] hover:bg-[#008f4c] active:scale-95 text-white rounded-2xl flex items-center justify-center shadow-md transition-all">
+            <i data-lucide="more-vertical" class="w-5 h-5"></i>
+          </button>
+
+          <!-- Menu Popover do FAB -->
+          <div id="fab-menu" class="hidden absolute bottom-14 right-0 w-52 bg-white rounded-2xl shadow-xl border border-slate-100 p-2 text-xs space-y-1 z-30">
+            <button onclick="triggerUpload(currentSlide)" class="w-full flex items-center gap-2 px-3 py-2 text-slate-700 hover:bg-slate-50 rounded-xl">
+              <i data-lucide="upload" class="w-4 h-4 text-emerald-600"></i> Trocar Foto Atual
+            </button>
+            <button onclick="showToast('Exportando fotos...')" class="w-full flex items-center gap-2 px-3 py-2 text-slate-700 hover:bg-slate-50 rounded-xl">
+              <i data-lucide="download" class="w-4 h-4"></i> Exportar Imagens
+            </button>
+            <button onclick="showToast('Sincronizando...')" class="w-full flex items-center gap-2 px-3 py-2 text-slate-700 hover:bg-slate-50 rounded-xl">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i> Atualizar Carteira
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Barra de Navegação Inferior -->
+    <div class="bg-white border-t border-slate-100 px-2 py-2 flex items-center justify-around z-20">
+      
+      <!-- Início -->
+      <button onclick="setActiveTab(this, 'Início')" class="nav-item flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 transition-colors py-1 px-2 rounded-lg">
+        <i data-lucide="home" class="w-5 h-5"></i>
+        <span class="text-[10px] font-medium">Início</span>
+      </button>
+
+      <!-- Dados -->
+      <button onclick="setActiveTab(this, 'Dados')" class="nav-item flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 transition-colors py-1 px-2 rounded-lg">
+        <i data-lucide="file-text" class="w-5 h-5"></i>
+        <span class="text-[10px] font-medium">Dados</span>
+      </button>
+
+      <!-- QR Code (Ativo com ícone verde) -->
+      <button onclick="setActiveTab(this, 'QR Code')" class="nav-item flex flex-col items-center gap-1 text-[#00a859] py-1 px-2 rounded-lg">
+        <div class="w-9 h-9 bg-[#00a859] text-white rounded-xl flex items-center justify-center shadow-sm">
+          <i data-lucide="qr-code" class="w-5 h-5"></i>
+        </div>
+        <span class="text-[10px] font-medium">QR Code</span>
+      </button>
+
+      <!-- Carteira -->
+      <button onclick="setActiveTab(this, 'Carteira')" class="nav-item flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 transition-colors py-1 px-2 rounded-lg">
+        <i data-lucide="wallet" class="w-5 h-5"></i>
+        <span class="text-[10px] font-medium">Carteira</span>
+      </button>
+
+      <!-- Menu -->
+      <button onclick="setActiveTab(this, 'Menu')" class="nav-item flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 transition-colors py-1 px-2 rounded-lg">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+        <span class="text-[10px] font-medium">Menu</span>
+      </button>
+
+    </div>
+
+    <!-- Toast de Notificação -->
+    <div id="toast" class="absolute top-16 left-1/2 -translate-x-1/2 bg-slate-900/90 backdrop-blur-sm text-white text-xs px-4 py-2 rounded-full shadow-lg opacity-0 transition-opacity pointer-events-none z-40">
+      Mensagem
+    </div>
+
+  </div>
+
+  <script>
+    let currentSlide = 0;
+    const totalSlides = 4;
+    let selectedSlideForUpload = 0;
+    let isZoomed = false;
+
+    // Inicialização dos ícones Lucide
+    lucide.createIcons();
+
+    // Controle de Navegação nos Slides
+    function goToSlide(index) {
+      currentSlide = index;
+      const slides = document.getElementById('document-slides');
+      slides.style.transform = `translateX(-${currentSlide * 100}%)`;
+      updateDots();
+    }
+
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % totalSlides;
+      goToSlide(currentSlide);
+    }
+
+    function updateDots() {
+      const dots = document.querySelectorAll('.dot');
+      dots.forEach((dot, index) => {
+        if (index === currentSlide) {
+          dot.className = "dot w-2.5 h-2.5 rounded-full bg-[#1e3a8a] transition-all";
+        } else {
+          dot.className = "dot w-2 h-2 rounded-full bg-slate-300 transition-all";
+        }
+      });
+    }
+
+    // Gesto de deslizar (Touch e Mouse Swipe)
+    const touchContainer = document.getElementById('touch-container');
+    let startX = 0;
+    let isDragging = false;
+
+    touchContainer.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+      isDragging = true;
+    }, { passive: true });
+
+    touchContainer.addEventListener('touchend', (e) => {
+      if (!isDragging) return;
+      const endX = e.changedTouches[0].clientX;
+      handleSwipe(startX, endX);
+      isDragging = false;
+    });
+
+    touchContainer.addEventListener('mousedown', (e) => {
+      startX = e.clientX;
+      isDragging = true;
+    });
+
+    touchContainer.addEventListener('mouseup', (e) => {
+      if (!isDragging) return;
+      const endX = e.clientX;
+      handleSwipe(startX, endX);
+      isDragging = false;
+    });
+
+    touchContainer.addEventListener('mouseleave', () => {
+      isDragging = false;
+    });
+
+    function handleSwipe(start, end) {
+      const diff = start - end;
+      if (Math.abs(diff) > 40) {
+        if (diff > 0 && currentSlide < totalSlides - 1) {
+          goToSlide(currentSlide + 1);
+        } else if (diff < 0 && currentSlide > 0) {
+          goToSlide(currentSlide - 1);
+        }
+      }
+    }
+
+    // Upload de imagem personalizada por slide
+    function triggerUpload(slideIndex) {
+      selectedSlideForUpload = slideIndex;
+      document.getElementById('file-input').click();
+      document.getElementById('fab-menu').classList.add('hidden');
+    }
+
+    function handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const imgElement = document.getElementById(`img-${selectedSlideForUpload}`);
+          imgElement.src = e.target.result;
+          showToast(`Foto ${selectedSlideForUpload + 1} atualizada!`);
+        };
+        reader.readAsDataURL(file);
+      }
+      event.target.value = '';
+    }
+
+    // Função de Zoom
+    function toggleZoom() {
+      isZoomed = !isZoomed;
+      const activeImg = document.getElementById(`img-${currentSlide}`);
+      activeImg.style.transform = isZoomed ? 'scale(1.35)' : 'scale(1)';
+      showToast(isZoomed ? "Zoom ativado" : "Zoom normal");
+    }
+
+    // Alternar menu FAB
+    function toggleFabMenu() {
+      const menu = document.getElementById('fab-menu');
+      menu.classList.toggle('hidden');
+    }
+
+    // Seleção de aba na barra inferior
+    function setActiveTab(element, name) {
+      document.querySelectorAll('.nav-item').forEach(el => {
+        el.classList.remove('text-[#00a859]');
+        el.classList.add('text-slate-400');
+      });
+
+      element.classList.remove('text-slate-400');
+      element.classList.add('text-[#00a859]');
+
+      showToast(`Aba: ${name}`);
+
+      if (name === 'Carteira' || name === 'Dados') {
+        goToSlide(0);
+      } else if (name === 'QR Code') {
+        goToSlide(3);
+      }
+    }
+
+    // Exibir notificação rápida (Toast)
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.innerText = message;
+      toast.classList.remove('opacity-0');
+       toast.classList.add('opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0');
+      }, 2000);
+    }
+
+    function resetApp() {
+      goToSlide(0);
+      showToast("Página reiniciada");
+    }
+
+    // Fechar menu ao clicar fora
+    document.addEventListener('click', (e) => {
+      const fabContainer = e.target.closest('.relative');
+      if (!fabContainer) {
+        document.getElementById('fab-menu').classList.add('hidden');
+      }
+    });
+  </script>
+</body>
+</html>

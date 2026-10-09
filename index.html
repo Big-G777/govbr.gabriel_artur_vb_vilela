@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Carteira de Documentos - Protótipo Móvel</title>
+  <style>
+    :root {
+      --primary-blue: #1351b4;
+      --navy-blue: #0c326f;
+      --light-cyan-1: #a7e8f3;
+      --light-cyan-2: #b8edf6;
+      --accent-yellow: #f2a900;
+      --accent-green: #138836;
+      --text-dark: #1e293b;
+      --text-muted: #64748b;
+      --bg-light: #f8fafc;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      background-color: #e2e8f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: var(--text-dark);
+    }
+
+    /* Container que se adapta tanto à visualização no PC quanto perfeitamente em telas de celulares */
+    .mobile-viewport {
+      width: 100%;
+      max-width: 430px;
+      height: 100vh;
+      max-height: 932px;
+      background-color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Em dispositivos verdadeiramente móveis, expande para ocupar 100% da tela real */
+    @media (max-width: 480px) {
+      body {
+        background-color: #ffffff;
+      }
+      .mobile-viewport {
+        max-width: 100%;
+        height: 100vh;
+        max-height: 100vh;
+        box-shadow: none;
+      }
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 20px;
+      background-color: #ffffff;
+      border-bottom: 1px solid #f1f5f9;
+      padding-top: max(14px, env(safe-area-inset-top));
+    }
+
+    .brand-logo {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Estilização customizada das cores das letras */
+    .char-g { color: var(--primary-blue); }
+    .char-o { color: var(--accent-yellow); }
+    .char-v { color: #00a859; }
+    .char-dot { color: #475569; }
+    .char-b { color: var(--primary-blue); }
+    .char-r { color: var(--accent-yellow); }
+
+    .user-profile {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid #e2e8f0;
+      cursor: pointer;
+    }
+
+    .user-profile img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .top-bar {
+      background-color: var(--navy-blue);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      padding: 14px 18px;
+      position: relative;
+    }
+
+    .btn-back {
+      background: none;
+      border: none;
+      color: #ffffff;
+      font-size: 24px;
+      font-weight: 300;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 8px;
+      position: absolute;
+      left: 12px;
+      border-radius: 50%;
+      transition: background 0.2s;
+    }
+
+    .btn-back:active {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .top-bar h1 {
+      font-size: 17px;
+      font-weight: 500;
+      width: 100%;
+      text-align: center;
+      letter-spacing: 0.2px;
+    }
+
+    main {
+      flex: 1;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      overflow-y: auto;
+      background-color: var(--bg-light);
+    }
+
+    .card-container {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Cartão do Documento com Gradiente e Sombras */
+    .documento-card {
+      background: linear-gradient(135deg, var(--light-cyan-1) 0%, var(--light-cyan-2) 100%);
+      border-radius: 18px;
+      width: 100%;
+      min-height: 220px;
+      padding: 26px 22px 22px 22px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .documento-card:active {
+      transform: scale(0.99);
+    }
+
+    /* Etiqueta amarela ID no canto superior esquerdo */
+    .tag-id-corner {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 52px;
+      height: 52px;
+      background: #ffd100;
+      clip-path: polygon(0 0, 100% 0, 0 100%);
+      z-index: 3;
+    }
+
+    .tag-id-text {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #000000;
+      z-index: 4;
+      line-height: 1;
+    }
+
+    .card-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .card-content h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-top: 4px;
+      margin-bottom: 12px;
+    }
+
+    .card-content .nome {
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+      line-height: 1.4;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      max-width: 82%;
+    }
+
+    .card-content .label-cpf {
+      font-size: 13px;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 2px;
+    }
+
+    .card-content .cpf {
+      font-size: 14px;
+      font-weight: 600;
+      color: #334155;
+      letter-spacing: 0.5px;
+    }
+
+    /* Brasão SVG Integrado no Fundo */
+    .brasao-bg {
+      position: absolute;
+      right: -25px;
+      top: -15px;
+      width: 240px;
+      height: 240px;
+      opacity: 0.22;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Botão Adicionar Documento */
+    .btn-adicionar {
+      width: 100%;
+      background-color: var(--primary-blue);
+      color: #ffffff;
+      border: none;
+      padding: 16px;
+      border-radius: 30px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(19, 81, 180, 0.25);
+      transition: background-color 0.2s, transform 0.1s;
+      margin-top: 30px;
+    }
+
+    .btn-adicionar:active {
+      background-color: #0d3d8a;
+      transform: scale(0.98);
+    }
+
+    nav.bottom-nav {
+      background-color: #ffffff;
+      border-top: 1px solid #e2e8f0;
+      padding: 8px 12px calc(8px + env(safe-area-inset-bottom)) 12px;
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-end;
+      position: relative;
+      z-index: 10;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      width: 20%;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-item svg {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+    }
+
+    .nav-item.active {
+      color: var(--primary-blue);
+    }
+
+    /* Ícone do QR Code central destacado */
+    .nav-item.qr-code {
+      position: relative;
+      top: -10px;
+    }
+
+    .qr-circle {
+      width: 50px;
+      height: 50px;
+      background-color: var(--accent-green);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(19, 136, 54, 0.35);
+      margin-bottom: 2px;
+      transition: transform 0.2s;
+    }
+
+    .qr-circle:active {
+      transform: scale(0.92);
+    }
+
+    .qr-circle svg {
+      width: 24px;
+      height: 24px;
+      fill: #ffffff;
+    }
+
+    /* Toast Notification para interatividade */
+    .toast {
+      position: absolute;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background-color: rgba(15, 23, 42, 0.9);
+      color: #ffffff;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      pointer-events: none;
+      z-index: 100;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="mobile-viewport">
+    
+    <!-- Top Branding Bar -->
+    <header>
+      <div class="brand-logo">
+        <span class="char-g">g</span><span class="char-o">o</span><span class="char-v">v</span><span class="char-dot">.</span><span class="char-b">b</span><span class="char-r">r</span>
+      </div>
+      <div class="user-profile" onclick="showToast('Perfil do usuário')">
+        <img src="WhatsApp Image 2026-10-07 at 21.30.02.jpeg" alt="Foto de Perfil" onerror="this.src='https://placehold.co/100x100/1351b4/ffffff?text=U'">
+      </div>
+    </header>
+
+    <!-- Top Blue Title Bar -->
+    <div class="top-bar">
+      <button class="btn-back" onclick="showToast('Voltar para tela anterior')" aria-label="Voltar">&lt;</button>
+      <h1>Carteira de documentos</h1>
+    </div>
+
+    <!-- Main Content Area -->
+    <main>
+        <a href="carteira.html">
+      <div class="card-container">
+        <!-- Cartão do Documento de Identidade -->
+        <div class="documento-card" onclick="showToast('Documento selecionado')">
+          <div class="tag-id-corner"></div>
+          <span class="tag-id-text">ID</span>
+
+          
+
+          <div class="card-content">
+            <h2>Carteira de Identidade</h2>
+            <p class="nome">GABRIEL ARTUR VASCONCELOS BARBOSA VILELA</p>
+
+            <p class="label-cpf">CPF</p>
+            <p class="cpf">148.042.656-35</p>
+          </div>
+          </a>
+
+
+          <!-- SVG do Brasão das Armas no fundo com transparência -->
+          
+          <img src="Design sem nome (1).jpg"
+           class="brasao-bg" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="100" cy="100" r="75" stroke="#007a87" stroke-width="2" stroke-dasharray="4 2"/>
+            <circle cx="100" cy="100" r="45" stroke="#007a87" stroke-width="3"/>
+            <polygon points="100,20 118,62 162,62 126,88 140,130 100,104 60,130 74,88 38,62 82,62" fill="#007a87"/>
+            <circle cx="100" cy="100" r="28" fill="#a2ecf8" stroke="#007a87" stroke-width="2"/>
+            <polygon points="100,85 102,90 107,90 103,93 105,98 100,95 95,98 97,93 93,90 98,90" fill="#007a87"/>
+            <polygon points="100,108 102,113 107,113 103,116 105,121 100,118 95,121 97,116 93,113 98,113" fill="#007a87"/>
+            <polygon points="88,98 90,103 95,103 91,106 93,111 88,108 83,111 85,106 81,103 86,103" fill="#007a87"/>
+            <polygon points="112,98 114,103 119,103 115,106 117,111 112,108 107,111 109,106 105,103 110,103" fill="#007a87"/>
+            <path d="M100 10 L100 190 M80 170 L120 170" stroke="#007a87" stroke-width="3"/>
+        
+
+          
+        </div>
+
+        <!-- Botão Adicionar Documento -->
+        <button class="btn-adicionar" onclick="showToast('Abrindo adição de novo documento...')">Adicionar documento</button>
+      </div>
+    </main>
+
+    <nav class="bottom-nav">
+      <a class="nav-item" onclick="setActiveNav(this, 'Início')">
+        <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span>Início</span>
+      </a>
+
+      <a class="nav-item" onclick="setActiveNav(this, 'Dados')">
+        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+        <span>Dados</span>
+      </a>
+
+      <a class="nav-item qr-code" onclick="setActiveNav(this, 'Leitor de QR Code')">
+        <div class="qr-circle">
+          <svg viewBox="0 0 24 24"><path d="M3 3h8v8H3zm2 2v4h4V5zm8-2h8v8h-8zm2 2v4h4V5zM3 13h8v8H3zm2 2v4h4v-4zm13-2h3v2h-3zm-3 2h2v3h-2zm2 3h3v3h-3zm-2 1h2v2h-2zm3-3h2v2h-2z"/></svg>
+        </div>
+        <span>QR Code</span>
+      </a>
+
+      <a class="nav-item active" onclick="setActiveNav(this, 'Carteira')">
+        <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+        <span>Carteira</span>
+      </a>
+
+      <a class="nav-item" onclick="setActiveNav(this, 'Menu')">
+        <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+        <span>Menu</span>
+      </a>
+    </nav>
+
+    <!-- Elemento para mensagens interativas -->
+    <div id="toast" class="toast">Ação executada com sucesso</div>
+
+  </div>
+
+  <script>
+    let toastTimeout;
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2200);
+    }
+
+    function setActiveNav(element, label) {
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+      element.classList.add('active');
+      showToast('Aba selecionada: ' + label);
+    }
+  </script>
+</body>
+</html>
